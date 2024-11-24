@@ -83,21 +83,20 @@ This microservice is built using **Spring Boot** to manage employee data stored 
 - **Sample Request**:
   ```http
   POST /api/v1/employee/add
-Content-Type: application/json
-{
-    "employeeId": 1101,
-    "firstName": "test",
-    "lastName": "tester",
-    "email": "testEmail",
-    "phoneNumber": "515.123.4567",
-    "hireDate": "2024-11-22",
-    "jobId": "AD_PRES",
-    "salary": 24000,
-    "commissionPct": null,
-    "managerId": null,
-    "departmentId": 90
-}
-
+  Content-Type: application/json
+  {
+      "employeeId": 1101,
+      "firstName": "test",
+      "lastName": "tester",
+      "email": "testEmail",
+      "phoneNumber": "515.123.4567",
+      "hireDate": "2024-11-22",
+      "jobId": "AD_PRES",
+      "salary": 24000,
+      "commissionPct": null,
+      "managerId": null,
+      "departmentId": 90
+  }
   ```
   - **Sample Response**:
   ```json
