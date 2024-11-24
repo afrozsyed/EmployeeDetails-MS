@@ -46,7 +46,7 @@ This microservice is built using **Spring Boot** to manage employee data stored 
 - **Description**: Retrieves the details of an employee by their unique ID.
 - **Sample Request**:
   ```http
- GET /api/v1/employee/101
+  GET /api/v1/employee/101
   ```
   - **Sample Response**:
   ```json
