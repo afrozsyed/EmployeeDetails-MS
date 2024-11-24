@@ -5,26 +5,37 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.employeeDept.demo.dto.EmployeeDto;
 import com.employeeDept.demo.entities.Employees;
 import com.employeeDept.demo.repositories.EmployeeRepo;
 import com.employeeDept.demo.services.EmployeeService;
+import com.employeeDept.demo.utils.CustomResponse;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
 	
 	@Autowired
 	private EmployeeRepo employeeRepo;
+	
+	@Autowired
+	private CustomResponse customResponse;
 
 	@Override
-	public EmployeeDto getEmployeeById(Integer Id) {
-		Optional<Employees> empById = this.employeeRepo.findById(Id);
-		if (empById.isPresent())
-			return repoToDto(empById.get());
-		else
-			return new EmployeeDto();
+	public CustomResponse getEmployeeById(Integer Id) {
+		try {
+			Optional<Employees> empById = this.employeeRepo.findById(Id);
+			if (empById.isPresent())
+				return customResponse.generateCustomResponse(HttpStatus.FOUND.value(),"Success","Employee details fetched SuccessFully", repoToDto(empById.get()));
+			else
+				return customResponse.generateCustomResponse(HttpStatus.NOT_FOUND.value(),"Failed","Employee details Not Found", null);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return customResponse.generateCustomResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(),"Failed","Error Occured"+e.getMessage(), null);
+		}
 	}
 
 	@Override
@@ -92,9 +103,18 @@ public class EmployeeServiceImpl implements EmployeeService {
 	}
 
 	@Override
-	public EmployeeDto addEmployee(EmployeeDto emp) {
-		Employees savedEmp = this.employeeRepo.save(DtoToRepo(emp));
-		return repoToDto(savedEmp);
+	public CustomResponse addEmployee(EmployeeDto emp) {
+		try {
+			Employees savedEmp = this.employeeRepo.save(DtoToRepo(emp));
+			if(savedEmp!=null)
+				return customResponse.generateCustomResponse(HttpStatus.CREATED.value(),"Success","Employee Created SuccessFully", repoToDto(savedEmp));
+			else
+				return customResponse.generateCustomResponse(HttpStatus.FORBIDDEN.value(),"Failed","Failed to create Employee", null);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return customResponse.generateCustomResponse(HttpStatus.FORBIDDEN.value(),"Failed","UnExpected Error Occured:"+e.getMessage(), null);
+		}
 	}
 
 	@Override

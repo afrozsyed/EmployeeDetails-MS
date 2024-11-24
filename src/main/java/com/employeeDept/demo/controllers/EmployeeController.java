@@ -3,6 +3,7 @@ package com.employeeDept.demo.controllers;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.employeeDept.demo.dto.EmployeeDto;
 import com.employeeDept.demo.services.EmployeeService;
+import com.employeeDept.demo.utils.CustomResponse;
 
 @RestController
 @RequestMapping("/api/v1/employee")
@@ -22,6 +24,8 @@ public class EmployeeController {
 	
 	@Autowired
 	private EmployeeService empService;
+	@Autowired
+	private CustomResponse customResponse;
 	
 	//**************** Get Mappings  **********************//
 	
@@ -36,11 +40,21 @@ public class EmployeeController {
 
     // Fetch an employee by ID
     @GetMapping("/{empId}")
-    public ResponseEntity<EmployeeDto> getEmployeeById(@PathVariable int empId) {
-        EmployeeDto employee = empService.getEmployeeById(empId);
-        return employee == null
-                ? ResponseEntity.notFound().build()
-                : ResponseEntity.ok(employee);
+    public CustomResponse getEmployeeById(@PathVariable(required = false) String empId) {
+    	if (empId == null || empId.trim().isEmpty()) {
+            String errorMessage = "Invalid input: empId is missing or empty.";
+            return customResponse.generateCustomResponse(HttpStatus.NOT_FOUND.value(),"Failed",errorMessage, null);            
+        }
+    	
+    	try {
+            // Validate if empId is a numeric value
+            int employeeId = Integer.parseInt(empId);
+            CustomResponse employeeResp = empService.getEmployeeById(employeeId);
+            return employeeResp;
+        } catch (NumberFormatException ex) {
+            String errorMessage = "Invalid input: empId must be a numeric value.";
+            return customResponse.generateCustomResponse(HttpStatus.BAD_REQUEST.value(),"Failed",errorMessage, null);   
+        }
     }
 
     // Fetch employees by department ID
@@ -68,11 +82,9 @@ public class EmployeeController {
 	
 	
 	@PostMapping("add")
-	public ResponseEntity<EmployeeDto> addEmployee(@RequestBody EmployeeDto emp){
-		EmployeeDto employee = empService.addEmployee(emp);
-        return employee == null
-                ? ResponseEntity.notFound().build()
-                : ResponseEntity.ok(employee);
+	public CustomResponse addEmployee(@RequestBody EmployeeDto emp){
+		CustomResponse employeeResponse = empService.addEmployee(emp);
+        return employeeResponse;
 	}
 	
 	@DeleteMapping("delete/{empId}")
