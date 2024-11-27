@@ -1,7 +1,5 @@
 package com.employeeDept.demo.controllers;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,14 +27,12 @@ public class EmployeeController {
 	
 	//**************** Get Mappings  **********************//
 	
-	 // Fetch all employees
-    @GetMapping("/all")
-    public ResponseEntity<List<EmployeeDto>> getAllEmployees() {
-        List<EmployeeDto> employees = empService.getAllEmployees();
-        return employees.isEmpty()
-                ? ResponseEntity.noContent().build()
-                : ResponseEntity.ok(employees);
-    }
+	// Fetch all employees
+	@GetMapping("/all")
+	public CustomResponse getAllEmployees() {
+		CustomResponse allEmployeesData = empService.getAllEmployees();
+		return allEmployeesData;
+	}
 
     // Fetch an employee by ID
     @GetMapping("/{empId}")
@@ -59,20 +55,38 @@ public class EmployeeController {
 
     // Fetch employees by department ID
     @GetMapping("/by-department")
-    public ResponseEntity<List<EmployeeDto>> getEmployeesByDeptId(@RequestParam int deptId) {
-        List<EmployeeDto> employees = empService.getEmployeesByDept(deptId);
-        return employees.isEmpty()
-                ? ResponseEntity.noContent().build()
-                : ResponseEntity.ok(employees);
+    public CustomResponse getEmployeesByDeptId(@RequestParam String deptId) {
+    	if (deptId == null || deptId.trim().isEmpty()) {
+    		String errorMessage = "Invalid input: deptId is missing or empty.";
+            return customResponse.generateCustomResponse(HttpStatus.NOT_FOUND.value(),"Failed",errorMessage, null); 
+    	}
+    	try {
+            // Validate if deptId is a numeric value
+            int departmentId = Integer.parseInt(deptId);
+            CustomResponse employeeResp = empService.getEmployeesByDept(departmentId);
+            return employeeResp;
+        } catch (NumberFormatException ex) {
+            String errorMessage = "Invalid input: deptId must be a numeric value.";
+            return customResponse.generateCustomResponse(HttpStatus.BAD_REQUEST.value(),"Failed",errorMessage, null);   
+        }
     }
 
     // Fetch employees by manager ID
     @GetMapping("/by-manager")
-    public ResponseEntity<List<EmployeeDto>> getEmployeesByManagerId(@RequestParam int managerId) {
-        List<EmployeeDto> employees = empService.getEmployeesByManagerId(managerId);
-        return employees.isEmpty()
-                ? ResponseEntity.noContent().build()
-                : ResponseEntity.ok(employees);
+    public CustomResponse getEmployeesByManagerId(@RequestParam String managerId) {
+    	if (managerId == null || managerId.trim().isEmpty()) {
+    		String errorMessage = "Invalid input: managerId is missing or empty.";
+            return customResponse.generateCustomResponse(HttpStatus.NOT_FOUND.value(),"Failed",errorMessage, null); 
+    	}
+    	try {
+            // Validate if managerId is a numeric value
+            int mgrId = Integer.parseInt(managerId);
+            CustomResponse employeeResp = empService.getEmployeesByManagerId(mgrId);
+            return employeeResp;
+        } catch (NumberFormatException ex) {
+            String errorMessage = "Invalid input: managerId must be a numeric value.";
+            return customResponse.generateCustomResponse(HttpStatus.BAD_REQUEST.value(),"Failed",errorMessage, null);   
+        }
     }
 	
 	@GetMapping("test")

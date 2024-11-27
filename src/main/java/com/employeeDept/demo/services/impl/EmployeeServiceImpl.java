@@ -39,13 +39,18 @@ public class EmployeeServiceImpl implements EmployeeService {
 	}
 
 	@Override
-	public List<EmployeeDto> getAllEmployees() {
-		List<Employees> allEmp = this.employeeRepo.findAll();
-		List<EmployeeDto> empDtoList = new ArrayList<EmployeeDto>();
-		for (Employees employees : allEmp) {
-			empDtoList.add(repoToDto(employees));
+	public CustomResponse getAllEmployees() {
+		try {
+			List<Employees> allEmp = this.employeeRepo.findAll();
+			List<EmployeeDto> empDtoList = new ArrayList<EmployeeDto>();
+			for (Employees employees : allEmp) {
+				empDtoList.add(repoToDto(employees));
+			}
+			return customResponse.generateCustomResponse(HttpStatus.FOUND.value(),"Success","Employee details fetched SuccessFully", empDtoList);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return customResponse.generateCustomResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(),"Failed","Error Occured"+e.getMessage(), null);
 		}
-		return empDtoList;
 	}
 	
 	private EmployeeDto repoToDto(Employees employee) {
@@ -83,23 +88,41 @@ public class EmployeeServiceImpl implements EmployeeService {
 	}
 
 	@Override
-	public List<EmployeeDto> getEmployeesByDept(int deptId) {
-		List<Employees> deptEmp = this.employeeRepo.findByDepartmentId(Integer.valueOf(deptId));
-		List<EmployeeDto> empDtoList = new ArrayList<EmployeeDto>();
-		for (Employees employees : deptEmp) {
-			empDtoList.add(repoToDto(employees));
+	public CustomResponse getEmployeesByDept(int deptId) {
+		try {
+			List<Employees> deptEmp = this.employeeRepo.findByDepartmentId(Integer.valueOf(deptId));
+			List<EmployeeDto> empDtoList = new ArrayList<EmployeeDto>();
+			for (Employees employees : deptEmp) {
+				empDtoList.add(repoToDto(employees));
+			}
+			if (empDtoList!=null && !empDtoList.isEmpty() && empDtoList.size()>0)
+				return customResponse.generateCustomResponse(HttpStatus.FOUND.value(),"Success","Employee details fetched SuccessFully", empDtoList);
+			else
+				return customResponse.generateCustomResponse(HttpStatus.NOT_FOUND.value(),"Failed","Employee details Not Found", null);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return customResponse.generateCustomResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(),"Failed","Error Occured"+e.getMessage(), null);
 		}
-		return empDtoList;
 	}
 
 	@Override
-	public List<EmployeeDto> getEmployeesByManagerId(int managerId) {
-		List<Employees> deptEmp = this.employeeRepo.findByManagerId(Integer.valueOf(managerId));
-		List<EmployeeDto> empDtoList = new ArrayList<EmployeeDto>();
-		for (Employees employees : deptEmp) {
-			empDtoList.add(repoToDto(employees));
+	public CustomResponse getEmployeesByManagerId(int managerId) {
+		try {
+			List<Employees> deptEmp = this.employeeRepo.findByManagerId(Integer.valueOf(managerId));
+			List<EmployeeDto> empDtoList = new ArrayList<EmployeeDto>();
+			for (Employees employees : deptEmp) {
+				empDtoList.add(repoToDto(employees));
+			}
+			if (empDtoList!=null && !empDtoList.isEmpty() && empDtoList.size()>0)
+				return customResponse.generateCustomResponse(HttpStatus.FOUND.value(),"Success","Employee details fetched SuccessFully", empDtoList);
+			else
+				return customResponse.generateCustomResponse(HttpStatus.NOT_FOUND.value(),"Failed","Employee details Not Found", null);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return customResponse.generateCustomResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(),"Failed","Error Occured"+e.getMessage(), null);
 		}
-		return empDtoList;
 	}
 
 	@Override
